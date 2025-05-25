@@ -9,7 +9,7 @@ Azure Functions (Timer Trigger) to automate it
 GitHub for version control
 🔎 How It Works
 Every 30 minutes, an Azure Function runs my Python script.
-The script requests the HTML from the Cortland Las Colinas apartment page.
+The script requests the HTML from the apartment page.
 It uses BeautifulSoup to parse the DOM and extract apartment data (unit number, floor, bedrooms, price).
 If a matching 2-bedroom unit on floor 1, 2, or 3 is found, it sends an email via SendGrid.
 🧠 Why I Chose Azure Functions
