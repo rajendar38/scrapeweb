@@ -23,7 +23,7 @@ Apartment hunting online is time-consuming and inefficient. Most sites don’t o
 ## 🔎 How It Works
 
 - Every 30 minutes, an Azure Function triggers my Python script.
-- The script scrapes apartment listings from [Cortland Las Colinas](https://cortland.com/apartments/the-palmer-at-las-colinas/available-apartments/).
+- The script scrapes apartment listings from [Apartments](https://cortland.com/apartments/the-palmer-at-las-colinas/available-apartments/).
 - `BeautifulSoup` parses the HTML and extracts:
   - Unit number
   - Floor
