@@ -1,0 +1,132 @@
+Perfect — if you don’t need a template engine, that simplifies the design. Your focus is just to extract configurable fields from raw Kubernetes manifests and generate a values.yaml file from them, without converting the original manifests into Helm templates.
+
+⸻
+
+✅ Revised High-Level Design (No Template Engine)
+
+Goal: From raw Kubernetes manifests (Deployment, Service, etc.), generate a values.yaml file capturing user-configurable fields.
+
+⸻
+
+1. Input
+	•	One or more YAML manifest files (Deployment, Service, ConfigMap, VirtualService, etc.)
+
+⸻
+
+2. Output
+	•	A single values.yaml file with all parameter-like values extracted
+
+⸻
+
+3. Architecture Components
+
+🔹 A. Manifest Collector
+	•	Load multiple .yaml or .yml files from a folder or CLI argument
+	•	Support:
+	•	Single documents
+	•	Multi-document YAML (— separated)
+
+🔹 B. Field Extractor
+	•	For each resource kind, extract specific fields:
+	•	Deployment:
+	•	.spec.replicas
+	•	.spec.template.spec.containers[].image
+	•	.spec.template.spec.containers[].resources
+	•	Service:
+	•	.spec.type, .spec.ports
+	•	ConfigMap:
+	•	.data key-values
+	•	VirtualService:
+	•	.spec.hosts, .spec.http[].route[].destination.host
+	•	Allow user to configure fields to extract via a fields.yaml config if needed later
+
+🔹 C. Values Builder
+	•	For each extracted field, create a corresponding entry in values.yaml
+	•	Use logical structure:
+
+deployment:
+  replicaCount: 3
+  image:
+    repository: nginx
+    tag: 1.21
+config:
+  APP_ENV: "dev"
+  DB_HOST: "db.example.com"
+
+
+
+🔹 D. Output Writer
+	•	Writes final values.yaml
+	•	Optional: Split values by kind (e.g., deployment-values.yaml, service-values.yaml) or keep unified
+
+⸻
+
+4. Sample Input & Output
+
+🔸 Input: deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - name: app
+          image: myapp:v1.0.0
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+🔸 Output: values.yaml
+
+deployment:
+  replicaCount: 2
+  image:
+    name: myapp
+    tag: v1.0.0
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+
+
+⸻
+
+5. Optional Features
+
+Feature	Description
+--input-dir / --input-file	Accepts path to manifests
+--include-kinds	Filter to extract only Deployments, etc.
+--flatten	Flattens keys in values.yaml
+--json-output	Also generate values.json
+
+
+⸻
+
+6. Implementation Suggestion
+
+✔ Python with ruamel.yaml
+	•	Maintains order + comments in YAML
+	•	Easy parsing and writing
+
+⸻
+
+✅ Summary
+
+Step	Action
+1	Load manifest(s)
+2	Identify known K8s object kinds
+3	Extract specific fields (image, replicas, config, etc.)
+4	Build structured values.yaml
+5	Write output YAML file
+
+
+⸻
+
+Would you like:
+	•	A working Python starter script?
+	•	Or a CLI tool design spec for this functionality?
